@@ -3,7 +3,10 @@
 int
 isLeap(int year)
 {
-	return ((!(year % 4) && year % 100 ) || !(year % 400));
+	if (year > 1582)
+		return ((!(year % 4) && year % 100 ) || !(year % 400));
+	else
+		return (!(year % 4));
 }
 
 void
@@ -18,8 +21,13 @@ date_init(struct DAY *date, int in_day, int in_month, int in_year)
 void
 print_date(struct DAY date, int new_line)
 {
+	/*
+	 * Function prints date. If variable new_line contains true value, then
+	 * after printed date there will be new line sign. No such sign otherwise.
+	 */
+
 	if (date.correct) {
-		printf("%02d %02d %d", date.day, date.month, date.year);
+		printf("%02d.%02d.%d", date.day, date.month, date.year);
 		if (new_line)
 			printf("\n");
 	}
@@ -89,6 +97,13 @@ date_correctness(struct DAY date)
 int
 date_compare(struct DAY date_1, struct DAY date_2)
 {
+	/*
+	 * Function compares two dates. If the first date is after the second it returns 1.
+	 * If the second date is after the first it returns -1. If dates are the same it returns 0.
+	 * On error it returns ERROR.
+	 */
+
+
 		/* security check */
 	if (!(date_1.correct && date_2.correct))
 		return (ERROR);	
@@ -113,19 +128,25 @@ date_compare(struct DAY date_1, struct DAY date_2)
 
 	  /* dates are the same */
 	return (0);
-
 }
 
 int
 days_in_year(struct DAY date, int cal_change)
 {
+	/*
+	 * Function returns number of days from the beginning of the year.
+	 * If value of cal_change is true, change of calendar is considered
+	 * and otherwise not.
+	 */
+
+
 		/* security check */
 	if (!date.correct)
 		return (ERROR);
 
 	int counter = 0;
 
-	if (date.year == 1582 && cal_change) {
+	if (cal_change && date.year == 1582) {
 		struct DAY calendar_change_last_day = {4, 10, 1582, 1};
 		if (date_compare(date, calendar_change_last_day) == 1)
 			counter -= 10;
@@ -170,7 +191,7 @@ days(struct DAY date_1, struct DAY date_2)
 		return (ERROR);
 
 	int tmp;
-	struct DAY *max = NULL, *min = NULL;
+	struct DAY *max, *min;
 	if ((tmp = date_compare(date_1, date_2)) == 1) {
 		max = &date_1;
 		min = &date_2;
@@ -188,6 +209,7 @@ days(struct DAY date_1, struct DAY date_2)
 
 	struct DAY calendar_change_checker = {10, 10, 1582, 1};
 
+		/* calendar change */
 	if (date_compare(*max, calendar_change_checker) == 1 &&
 	    date_compare(*min, calendar_change_checker) == -1)
 		num_days -= 10;

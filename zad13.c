@@ -90,23 +90,23 @@ main()
 
 	date_init(&day1, 1, 1, 1000);
 	date_init(&day2, 1, 1, 2000);
-	assert(days(day1, day2) == 365232);
+	assert(days(day1, day2) == 365237);
 
 	date_init(&day1, 15, 1, 1923);
 	date_init(&day2, 12, 1, 1322);
-	assert(days(day1, day2) == 219503);
+	assert(days(day1, day2) == 219505);
 
 	date_init(&day1, 12, 1, 1322);
 	date_init(&day2, 15, 1, 1923);
-	assert(days(day1, day2) == 219503);
+	assert(days(day1, day2) == 219505);
 
 	date_init(&day1, 1, 1, 1324);
 	date_init(&day2, 1, 1, 1923);
-	assert(days(day1, day2) == 218770);
+	assert(days(day1, day2) == 218772);
 
 	date_init(&day1, 1, 1, 1400);
 	date_init(&day2, 1, 1, 1923);
-	assert(days(day1, day2) == 191011);
+	assert(days(day1, day2) == 191013);
 
 	date_init(&day1, 2, 2, 2004);
 	date_init(&day2, 29, 2, 2008);
