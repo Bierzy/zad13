@@ -14,6 +14,5 @@ days.o: days.c
 
 clean:
 	rm -rf *.o
-	rm -rf *.gch
 
 .PHONY: all clean
