@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -Wall -Werror -Wextra
+CFLAGS = -Wall -Werror
 
 all: main
 
@@ -12,7 +12,11 @@ zad13.o: zad13.c
 days.o: days.c
 	$(CC) $(CFLAGS) -c days.c
 
+git:
+	rm -rf *.o
+	rm out
+
 clean:
 	rm -rf *.o
 
-.PHONY: all clean
+.PHONY: all clean git

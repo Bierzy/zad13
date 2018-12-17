@@ -52,20 +52,6 @@ main()
 	date_init(&day1, 29, 2, 2003);
 	assert(date_correctness(day1) == 0);
 
-
-		/* print_date */
-	printf("\nprint date test:\n");
-	date_init(&day1, 26, 7, 1999);
-	print_date(day1, 1);
-	date_init(&day2, 18, 10, 1999);
-	print_date(day2, 1);
-	date_init(&day1, 1, 1, 1);
-	print_date(day1, 0);	printf(" ");
-	print_date(day2, 0);	printf(" ");
-	date_init(&day1, 31, 11, 1999);
-	print_date(day1, 1);
-	print_date(day1, 0);
-
 		/* date_compare */
 	date_init(&day1, 26, 7, 1999);
 	date_init(&day2, 18, 10, 1999);
@@ -140,7 +126,7 @@ main()
 	date_init();
 	assert(days(day1, day2) == );
 */
-	printf("\nACC\n");
+	printf("ACC\n");
 
 	return (0);
 }

@@ -1,46 +1,41 @@
 #include "days.h"
 
-int
+extern int
 isLeap(int year)
 {
-	if (year > 1582)
-		return ((!(year % 4) && year % 100 ) || !(year % 400));
-	else
+	/*
+	 * Function checks if the given year is a leap year.
+	 * It returns 1 if the year is a leap year and 0 otherwise.
+	 */
+
+		/* security check */
+	if (year < 1)
+		return (ERROR);
+	
+	if (year > 1582)	/* gregorian calendar */
+		return ((!(year % 4) && year % 100 ) || !(year % 400));	
+	else			/* julian calendar */
 		return (!(year % 4));
 }
 
-void
+extern void
 date_init(struct DAY *date, int in_day, int in_month, int in_year)
 {
+	/*
+	 * Function provides initialization of a new date.
+	 */
+
 	date->day = in_day;
 	date->month = in_month;
 	date->year = in_year;
 	date->correct = date_correctness(*date);
 }
 
-void
-print_date(struct DAY date, int new_line)
-{
-	/*
-	 * Function prints date. If variable new_line contains true value, then
-	 * after printed date there will be new line sign. No such sign otherwise.
-	 */
-
-	if (date.correct) {
-		printf("%02d.%02d.%d", date.day, date.month, date.year);
-		if (new_line)
-			printf("\n");
-	}
-	else
-		printf("\nerror!\nThere's no such a date:   %d %d %d\n\n", date.day,
-						      date.month, date.year);
-}
-
-int
+extern int
 date_correctness(struct DAY date)
 {
 	/*
-	 * Function checks correctness of given date.
+	 * Function checks correctness of the given date.
 	 * It returns 1 when date is correct and 0 otherwise.
 	 */
 
@@ -48,8 +43,6 @@ date_correctness(struct DAY date)
 	if (date.year < 1) {
 		return (0);
 	}
-
-	int leap = isLeap(date.year);
 
 		/* month correctness */
 	if (date.month < 1 || date.month > 12)
@@ -74,7 +67,7 @@ date_correctness(struct DAY date)
 				return (0);
 			break;
 		case 2:
-			if (leap) {
+			if (isLeap(date.year)) {
 				if (date.day > 29)
 					return (0);
 			}
@@ -83,8 +76,6 @@ date_correctness(struct DAY date)
 					return (0);
 			}
 			break;
-		default:
-			return (0);
 	}
 
 		/* julian to gregorain calendar change*/
@@ -94,7 +85,7 @@ date_correctness(struct DAY date)
 	return (1);
 }
 
-int
+extern int
 date_compare(struct DAY date_1, struct DAY date_2)
 {
 	/*
@@ -102,7 +93,6 @@ date_compare(struct DAY date_1, struct DAY date_2)
 	 * If the second date is after the first it returns -1. If dates are the same it returns 0.
 	 * On error it returns ERROR.
 	 */
-
 
 		/* security check */
 	if (!(date_1.correct && date_2.correct))
@@ -130,15 +120,14 @@ date_compare(struct DAY date_1, struct DAY date_2)
 	return (0);
 }
 
-int
+extern int
 days_in_year(struct DAY date, int cal_change)
 {
 	/*
 	 * Function returns number of days from the beginning of the year.
-	 * If value of cal_change is true, change of calendar is considered
-	 * and otherwise not.
+	 * If value of cal_change is true(different from 0), then the change
+	 * of the calendar is considered and otherwise not.
 	 */
-
 
 		/* security check */
 	if (!date.correct)
@@ -146,14 +135,18 @@ days_in_year(struct DAY date, int cal_change)
 
 	int counter = 0;
 
+		/* If cal_change is true the lack of ten days in 1582
+		   would be taken into consideration */
 	if (cal_change && date.year == 1582) {
 		struct DAY calendar_change_last_day = {4, 10, 1582, 1};
 		if (date_compare(date, calendar_change_last_day) == 1)
 			counter -= 10;
 	}
 
+		/* -1 because counting days in date's month is made separately */
 	int months_left = date.month - 1;
 
+		/* counting days in months before date's month */
 	while (months_left > 0) {
 		switch (months_left) {
 			case 1: case 3:
@@ -176,46 +169,59 @@ days_in_year(struct DAY date, int cal_change)
 		months_left--;
 	}
 
+		/* counting days in date's month */
 	counter += date.day;
 
 	return (counter);
 }
 
-int
+extern int
 days(struct DAY date_1, struct DAY date_2)
 {
+	/*
+	 * Function computes number of days between two dates.
+	 * It returns number of days between or ERROR if one of dates
+	 * is incorrect.
+	 */
+
 	int num_days = 0;
 
 		/* security check */
 	if (!(date_1.correct && date_2.correct))
 		return (ERROR);
 
+		/* setting order of dates */
 	int tmp;
-	struct DAY *max, *min;
+	struct DAY *later, *earlier;
 	if ((tmp = date_compare(date_1, date_2)) == 1) {
-		max = &date_1;
-		min = &date_2;
+		later = &date_1;
+		earlier = &date_2;
 	}
 	else if (tmp == -1) {
-		max = &date_2;
-		min = &date_1;
+		later = &date_2;
+		earlier = &date_1;
 	}
-	else {
+	else {	/* if dates are the same there were no days between them */
 		return (0);
 	}
 
-		/* in days difference */
-	num_days += days_in_year(*max, 0) - days_in_year(*min, 0);
+		/*
+		 * Difference between days from the beginning of the later
+		 * year and the days from the beginning of the earlier date.
+		 * If there were more days in the earlier date the negative 
+		 * difference will be compensated later.
+		 */
+	num_days += days_in_year(*later, 0) - days_in_year(*earlier, 0);
 
 	struct DAY calendar_change_checker = {10, 10, 1582, 1};
 
 		/* calendar change */
-	if (date_compare(*max, calendar_change_checker) == 1 &&
-	    date_compare(*min, calendar_change_checker) == -1)
+	if (date_compare(*later, calendar_change_checker) == 1 &&
+	    date_compare(*earlier, calendar_change_checker) == -1)
 		num_days -= 10;
 
 		/* in years difference */
-	for (int year = min->year; year < max->year; year++) {
+	for (int year = earlier->year; year < later->year; year++) {
 		if (isLeap(year))
 			num_days += LEAP_YEAR_DAYS;
 		else
