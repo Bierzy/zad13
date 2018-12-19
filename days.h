@@ -6,8 +6,6 @@
 extern "C++" {
 #endif
 
-#include <stdio.h>
-#include <stdlib.h>
 
 	/* Definition of macros */
 #define COMMON_YEAR_DAYS 365
@@ -23,7 +21,7 @@ struct DAY {
 };
 
 	/* Number of days between two dates */
-extern int days(struct DAY first, struct DAY second);
+extern int days(struct DAY date_1, struct DAY date_2);
 
 	/* Check if year is a leap year */
 extern int isLeap(int year);
